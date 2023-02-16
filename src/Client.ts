@@ -59,6 +59,10 @@ export default class SCESocClient extends Client {
 		return this.config.elevated_roles.moderator;
 	}
 
+	/**
+	 * Injects a delay into the runtime of a given code block
+	 * @param delay duration of sleep
+	 */
 	async sleep(delay: number = 5_000) {
 		await new Promise(resolve => setTimeout(resolve, delay));
 	}

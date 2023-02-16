@@ -55,12 +55,15 @@ export default class Command {
 
 	/**
 	 * 
-	 * @param message 
-	 * @param args
+	 * Implements the functionality of this command.
+	 * Returns a valid response type that can be sent using TextChannel.send()
+	 * 
+	 * @param _message 
+	 * @param _args
 	 * @abstract
 	 * @throws {CommandUnimplementedError}
 	 */
-	async textCommand(message: Message, args: String[]): Promise<MessageCreateOptions> {
+	async textCommand(_message: Message, _args: String[]): Promise<MessageCreateOptions> {
 		throw new CommandUnimplementedError(this.name);
 	}
 
