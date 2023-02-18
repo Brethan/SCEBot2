@@ -30,6 +30,4 @@ module.exports = async (client: SCESocClient) => {
 			client.commands.set(command.name, command);
 		}
 	}
-
-
 }
