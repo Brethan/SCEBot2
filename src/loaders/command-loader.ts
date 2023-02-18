@@ -22,10 +22,7 @@ module.exports = async (client: SCESocClient) => {
 
 				
 			const command: Command = new SubCommand["default"](client);
-			// commands in these subdirectories should be restricted implicitly 
-			if (folder.match(/maintainer|exec|admin|moderator/gi))
-				command[folder] = true;
-						
+			
 			// add the command to the collection
 			client.commands.set(command.name, command);
 		}

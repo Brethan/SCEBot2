@@ -1,14 +1,24 @@
 import { Client, Collection, ClientOptions, Message } from "discord.js";
 import { readdirSync, writeFileSync } from "fs";
+import { ElevatedRole } from "./commands/Command";
 import { resolve } from "path";
+
 import config from "../config.json";
 import Command from "./commands/Command";
+import { aliasProgramMap } from "./data/course_map";
 
 export type Config = typeof config;
 
 export default class SCESocClient extends Client {
 	config: Config;
+
 	commands: Collection<string, Command>;
+	
+	/** @readonly */
+	elevated_roles: Map<ElevatedRole, string>;
+
+	/** @readonly */
+	aliasToProgram: Map<string, string>;
 
 	constructor(options: ClientOptions) {
 		super(options);
@@ -16,6 +26,14 @@ export default class SCESocClient extends Client {
 		this.config = config;
 
 		this.commands = new Collection();
+		
+		this.elevated_roles = new Map<ElevatedRole, string>();
+		this.elevated_roles.set(ElevatedRole.MAINTAINER, this.maintainer)
+		this.elevated_roles.set(ElevatedRole.EXECUTIVE, this.exec)
+		this.elevated_roles.set(ElevatedRole.ADMIN, this.admin)
+		this.elevated_roles.set(ElevatedRole.MODERATOR, this.moderator)
+
+		this.aliasToProgram = aliasProgramMap;
 		
 		this.initLoaders();
 	}
@@ -32,15 +50,6 @@ export default class SCESocClient extends Client {
 	 */
 	get prefix(): string {
 		return this.config.prefix;
-	}
-
-	get elevated_roles(): string[] {
-		const roles: string[] = [];
-		for (const role in this.config.elevated_roles) {
-			roles.push(this.config.elevated_roles[role]);
-		}
-
-		return roles;
 	}
 	
 	get maintainer(): string {

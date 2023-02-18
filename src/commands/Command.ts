@@ -1,19 +1,26 @@
-import { GuildMember, Message, MessageCreateOptions } from "discord.js";
+import { GuildMember, Message, MessageCreateOptions, Snowflake } from "discord.js";
 import SCESocClient from "../Client";
 
 interface Options {
 	name: string,
 	description?: string,
-	moderator?: boolean,
-	admin?: boolean,
-	maintainer?: boolean,
-	exec?: boolean,
+	elevatedRole?: ElevatedRole,
 	autoclear?: number
 }
 
+export enum ElevatedRole {
+	NONE,
+	MODERATOR,
+	ADMIN,
+	EXECUTIVE,
+	MAINTAINER
+}
+
 export class CommandUnimplementedError extends Error {
+	command: string;
 	constructor(name: string) {
 		super(`Command ${name} has not been implemented yet!`);
+		this.command = name;
 	}
 }
 
@@ -25,32 +32,23 @@ export default class Command {
 	
 	/** short description explaining what this command does */
 	description: string;
-	
-	/** restricts command use to moderators and up */
-	moderator: boolean;
-	
-	/** restricts command use to admins and up */
-	admin: boolean;
-
-	/** restricts command use to the maintainer (immutable) */
-	maintainer: boolean;
-
-	/** restricts command use to the execs (immutable) */
-	exec: boolean;
 
 	/** amount of time before (successful) command output is deleted */
 	autoclear: number
+
+	/** Specified the elevator role required to use this command */
+	elevatedRole: ElevatedRole;
+
+	autoclearOverride: Map<string, number>;
 
 	constructor(client: SCESocClient, options: Options) {
 
 		this.client = client
 		this.name = options.name
 		this.description = options.description || options.name;
-		this.maintainer = options.maintainer || false;
-		this.moderator = options.moderator || false;
-		this.admin = options.admin || false;
-		this.exec = options.exec || false;
+		this.elevatedRole = options.elevatedRole || ElevatedRole.NONE;
 		this.autoclear = options.autoclear || -1;
+		this.autoclearOverride = new Map<string, number>();
 	}
 
 	/**
@@ -78,18 +76,46 @@ export default class Command {
 	 */
 	validateUser(member: GuildMember): boolean {
 		const { cache: memberRoles } = member.roles;
-		const { maintainer, exec, admin, moderator } = this.client;
-		
-		if (this.maintainer && member.id !== maintainer)
-			return false;
-		else if (this.exec && !memberRoles.has(exec))
-			return false;
-		else if (this.admin && !memberRoles.has(admin)) 
-			return false
-		else if (this.moderator && !memberRoles.has(moderator)) {
-			return false;
-		}
+		const elevationRoleMap = this.client.elevated_roles;
+		const requiredId = elevationRoleMap.get(this.elevatedRole);
 
-		return true;
+		// While the maintainer is working on commands, they should be able to use them
+		if (member.id === elevationRoleMap.get(ElevatedRole.MAINTAINER))
+			return true; // Comment out after testing is complete
+
+		switch (this.elevatedRole) {
+			case ElevatedRole.NONE:
+				return true
+			case ElevatedRole.MAINTAINER: // Is steve
+				return member.id === requiredId;
+			default:
+				return memberRoles.has(requiredId);
+		}
+	}
+
+	/**
+	 * Adds to a map of this commands overridden autoclears
+	 * The command handler will use the members autoclear instead of
+	 * this.autoclear once before deleting it.
+	 * 
+	 * @param tempAutoclear amount of time before response is deleted
+	 */
+	setOverrideAutoclear(memberId: Snowflake, tempAutoclear: number) {
+		this.autoclearOverride.set(memberId, tempAutoclear);
+	}
+
+	/**
+	 * Easy to use template for rejecting a users args.
+	 * 
+	 * Promptly deletes the message after the user has some time to 
+	 * find out what went wrong.
+	 * 
+	 * @param options payload to send to the server
+	 * @param tempAutoclear time before the reject will be deleted
+	 * @returns 
+	 */
+	rejectArgs(options: MessageCreateOptions, memberId: Snowflake, tempAutoclear = 10_000): MessageCreateOptions {
+		this.setOverrideAutoclear(memberId, tempAutoclear);
+		return options;
 	}
 }
