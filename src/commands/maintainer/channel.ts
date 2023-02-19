@@ -1,11 +1,12 @@
 import { Message, MessageCreateOptions } from "discord.js";
 import SCESocClient from "src/Client";
-import Command from "../Command";
+import Command, { ElevatedRole } from "../Command";
 
 export default class Channel extends Command {
 	constructor(client: SCESocClient) {
 		super(client, {
 			name: "channel",
+			elevatedRole: ElevatedRole.MAINTAINER,
 			autoclear: 3_000
 		})
 	}
