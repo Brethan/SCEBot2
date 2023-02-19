@@ -53,23 +53,24 @@ const commandHandler = async (client: SCESocClient, message: Message) => {
 	try { // Run command and send the response
 		const output = await command.textCommand(message, args);
 		const response = await message.channel.send(output);
-		const { id } = message.member;
-		if (command.autoclearOverride.has(id)) { // If command has autoclear... do that :)
+		const { id } = member;
+
+		if (command.autoclearOverride.has(id)) {
 			const autoclear = command.autoclearOverride.get(id)
 			command.autoclearOverride.delete(id)
 			await client.deleteMessage(response, autoclear);
 			
-		} else if (command.autoclear > 0) {
+		} else if (command.autoclear > 0) { // Normal autoclear behaviour
 			await client.deleteMessage(response, command.autoclear);
 		}
 
-	} catch (error) { // If command throws error, tell user and log error
-		if (error instanceof CommandUnimplementedError) {
+	} catch (error) {
+		if (error instanceof CommandUnimplementedError) { // get mad at maintainer
 			message.channel.send({ content: `<@${client.maintainer}>, you should probably hurry up`
 				+ ` and implement this command: \`${error.command}\``
 			})
 			
-		} else {
+		} else { // tell the user something went wrong
 			const e_msg = await message.channel.send({content: "Something went wrong, please try again!"});
 			console.error(error);
 			await client.deleteMessage(e_msg, 6_000);

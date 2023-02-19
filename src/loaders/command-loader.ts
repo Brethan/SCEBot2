@@ -20,7 +20,7 @@ module.exports = async (client: SCESocClient) => {
 			if (!Object.keys(SubCommand).length)
 				continue;
 
-				
+			// Forcibly call the constructor	
 			const command: Command = new SubCommand["default"](client);
 			
 			// add the command to the collection

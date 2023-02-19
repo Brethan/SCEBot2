@@ -14,11 +14,12 @@ export default class Ping extends Command {
 	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
 		if (!(message.channel instanceof TextChannel)) return;
 		const { id } = message.member
-		if (!args.length)
+
+		if (!args.length) // user didn't provide any arguments
 			return this.rejectArgs({ content: "Please specify how many messages you want deleted." }, id);
 		
 		const amount = parseInt(args[0]);
-		if (amount < 1 || amount > 100) {
+		if (isNaN(amount) || (amount < 1 || amount > 100)) { // user provided invalid arguments
 			return this.rejectArgs({ content: "Please specify a number between [1, 100)."}, id);
 		}
 
