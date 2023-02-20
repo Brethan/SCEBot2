@@ -3,6 +3,7 @@
         "target": "ESNext",
         "module": "commonjs",
         "rootDir": "./",
+        "strict": true,
         "outDir": "./dist/",
         "moduleResolution": "node",
         "importHelpers": true,
