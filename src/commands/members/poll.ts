@@ -1,4 +1,4 @@
-import { AwaitMessagesOptions, Colors, EmbedBuilder, Emoji, Message, MessageCreateOptions, TextChannel } from "discord.js";
+import { AwaitMessagesOptions, Colors, Embed, EmbedBuilder, EmbedData, Emoji, EmojiIdentifierResolvable, Message, MessageCreateOptions, TextChannel } from "discord.js";
 import { userInfo } from "os";
 import SCESocClient from "src/Client";
 import Command, { ElevatedRole } from "../Command";
@@ -8,11 +8,11 @@ export default class Poll extends Command {
 	constructor(client: SCESocClient) {
 		super(client, {
 			name: "poll",
-			elevatedRole: ElevatedRole.NONE,
+			elevatedRole: ElevatedRole.MEMBER,
 			autoclear: 5_000
 		})
 
-		this.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "🚫"];
+		this.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"] satisfies EmojiIdentifierResolvable[];
 	}
 
 	/**
@@ -29,8 +29,8 @@ export default class Poll extends Command {
 	 * @returns 
 	 * @override
 	 */
-	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
-		const response: MessageCreateOptions = await (!args.length ? 
+	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions | null> {
+		const response: MessageCreateOptions | null = await (!args.length ? 
 			this.responsePoll(message) : this.immediatePoll(message, args));
 		
 		console.log("bye :)");
@@ -38,11 +38,12 @@ export default class Poll extends Command {
 	}
 
 	async poll(message: Message, title: string, prompt: Message, pollOptions: string[], duration: number) {
+		const terminateEmoji = "🚫" satisfies EmojiIdentifierResolvable;
 		// Build poll embed
 		let description = "To vote, react using the emojis below.";
 		description += "\nThe poll has been set to end after " + duration + " seconds."
 		description += "\nThe creator of the poll can manually end the poll using the "
-		description += this.emojis.at(-1) + " emoji\n";
+		description += terminateEmoji + " emoji\n";
 
 		for (let i = 0; i < pollOptions.length; i++) {
 			description += `\n${this.emojis[i]}: ${pollOptions[i]}\n`
@@ -52,8 +53,9 @@ export default class Poll extends Command {
 			.setTitle("Poll - " + title)
 			.setDescription(description)
 			.setColor(Colors.Blurple)
-			.setThumbnail(message.guild.iconURL())
-			.setFooter({
+			.setThumbnail(message.guild?.iconURL() 
+				|| "https://www.scesoc.ca/wp-content/uploads/2020/05/cropped-SCESoc_Logo_Design_Yellow_2.png"
+			).setFooter({
 				text: `Created by ${message.author.tag}`,
 				iconURL: message.author.displayAvatarURL()
 			});
@@ -63,19 +65,20 @@ export default class Poll extends Command {
 		for (let i = 0; i < pollOptions.length; i++) {
 			await prompt.react(this.emojis[i]);
 		}
-
+	
 		// Reaction for terminating poll
-		await prompt.react(this.emojis.at(-1)); 
+		await prompt.react(terminateEmoji); 
 
 		const reactions = prompt.createReactionCollector({
 			filter: (reaction, user) => {
-				return this.emojis.includes(reaction.emoji.name) && !user.bot;
+				const { name } = reaction.emoji;
+				return !!name && !user.bot && this.emojis.includes(name);
 			}, time: duration * 1000
 		});
 
 		reactions.on("collect", (reaction, user) => {
 			const { name } = reaction.emoji;
-			if (message.author.id == user.id && name === this.emojis.at(-1))
+			if (message.author.id == user.id && name === terminateEmoji)
 				return reactions.stop();
 		});
 
@@ -83,12 +86,13 @@ export default class Poll extends Command {
 			const pollResults = [];
 			description = "The poll has ended!\nHere are the results:\n\n";	
 			for (let i = 0; i < pollOptions.length; i++) {
-				const result = prompt.reactions.cache.find(r => r.emoji.name === this.emojis[i]).count - 1;
+				const reaction = prompt.reactions.cache.find(r => r.emoji.name === this.emojis[i]);
+				const result = (reaction?.count) ? reaction.count - 1 : 0;
 				pollResults.push(result);
 				description += `\`${i}: "${pollOptions[i]}" - ${result} vote(s)\`\n`;
 			}
 
-			const embed = new EmbedBuilder(prompt.embeds[0])
+			const embed = new EmbedBuilder(prompt.embeds[0].toJSON())
 				.setDescription(description);
 
 			prompt.reactions.removeAll();
@@ -106,7 +110,7 @@ export default class Poll extends Command {
 	 * @param message 
 	 * @returns 
 	 */
-	async responsePoll(message: Message): Promise<MessageCreateOptions> {
+	async responsePoll(message: Message): Promise<MessageCreateOptions | null> {
 		const MAX_TRIES = 5;
 		const settings: AwaitMessagesOptions = {
 			filter: m => m.author.id === message.author.id,
@@ -120,10 +124,14 @@ export default class Poll extends Command {
 			
 		const prompt = await message.channel.send("Enter the title of your poll:");
 
-		try {
-			
+		if (!message.member) throw new Error();
 
-			const pollTitle: Message = (await message.channel.awaitMessages(settings)).first();
+		try {
+
+			const pollTitle: Message | undefined = (await message.channel.awaitMessages(settings)).first();
+
+			if (!pollTitle) throw new Error();
+				
 			const title = pollTitle?.content || "You entered an image, didn't you >:(";
 			await this.client.deleteMessage(pollTitle, 0);
 			
@@ -141,9 +149,10 @@ export default class Poll extends Command {
 			}
 
 			
+			// @ts-ignore
 			// Filter allows the user to send all numOptions messages before continuing
-			settings.max = numOptions;
 			settings.time *= numOptions / 2;
+			settings.max = numOptions; 
 			
 			// Collect poll options from the user
 			const pollOptions: string[] = [];
@@ -173,6 +182,8 @@ export default class Poll extends Command {
 				await prompt.edit({ content: validate });
 
 				const response = (await message.channel.awaitMessages(settings)).first();
+				if (!response) throw new Error();
+
 				const optionSelect = parseInt(response.content);
 
 				await this.client.deleteMessage(response, 0);
@@ -239,7 +250,8 @@ export default class Poll extends Command {
 		for (let i = 0; i < MAX_TRIES && invalid(value); i++) {
 			
 			const response = (await message.channel.awaitMessages(settings)).first();
-			value = parseInt(response?.content);
+			if (response)
+				value = parseInt(response?.content);
 
 			if (invalid(value)) { // loop again, tell off the user for being silly
 				message.channel.send({

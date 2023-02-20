@@ -37,11 +37,13 @@ const commandHandler = async (client: SCESocClient, message: Message) => {
 	const commandName = args.shift();
 
 	// Check if real command
-	if (!client.commands.has(commandName))
+	if (!commandName || !client.commands.has(commandName))
 		return false;
 	
 	const command = client.commands.get(commandName);
 	const { member } = message;
+	
+	if (!command || !member) return false;
 
 	// Test to see if user has perms to use this command
 	if (!command.validateUser(member)) {
@@ -73,7 +75,11 @@ const commandHandler = async (client: SCESocClient, message: Message) => {
 			})
 			
 		} else { // tell the user something went wrong
-			const e_msg = await message.channel.send({content: "Something went wrong, please try again!"});
+			const e_msg = await message.channel.send({
+				content: "Something went wrong, please try again!"
+					+ "If the problem persists, please contact Brethan#1337"
+			});
+			
 			console.error(error);
 			await client.deleteMessage(e_msg, 6_000);
 		}

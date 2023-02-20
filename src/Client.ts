@@ -32,6 +32,7 @@ export default class SCESocClient extends Client {
 		this.elevated_roles.set(ElevatedRole.EXECUTIVE, this.exec)
 		this.elevated_roles.set(ElevatedRole.ADMIN, this.admin)
 		this.elevated_roles.set(ElevatedRole.MODERATOR, this.moderator)
+		this.elevated_roles.set(ElevatedRole.MEMBER, this.member)
 
 		this.aliasToProgram = aliasProgramMap;
 		
@@ -68,6 +69,10 @@ export default class SCESocClient extends Client {
 		return this.config.elevated_roles.moderator;
 	}
 
+	get member(): string {
+		return this.config.elevated_roles.member;
+	}
+
 	/**
 	 * Injects a delay into the runtime of a given code block
 	 * @param delay duration of sleep
@@ -83,8 +88,11 @@ export default class SCESocClient extends Client {
 	 * @param message 
 	 * @param delay number of ms before message is deleted
 	 */
-	async deleteMessage(message: Message, delay = 5_000) {
+	async deleteMessage(message: Message | undefined, delay = 5_000) {
 		
+		if (!message)
+			return;
+			
 		try {
 			await this.sleep(delay);
 			await message.delete();

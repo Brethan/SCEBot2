@@ -30,6 +30,7 @@ export default class Channel extends Command {
 		// Found match(es), set the first match in the 
 		// list to the channel id command was invoked in
 		const selChannel = matches[0];
+		// @ts-ignore
 		this.client.config.channels[selChannel] = message.channel.id;
 		this.client.overwriteConfig();
 

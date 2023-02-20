@@ -11,8 +11,10 @@ export default class Ping extends Command {
 		})
 	}
 
-	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
-		if (!(message.channel instanceof TextChannel)) return;
+	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions | null> {
+		if (!(message.channel instanceof TextChannel) || !message.member) 
+			return null;
+			
 		const { id } = message.member
 
 		if (!args.length) // user didn't provide any arguments

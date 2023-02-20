@@ -4,12 +4,12 @@ import SCESocClient from "../Client";
 interface Options {
 	name: string,
 	description?: string,
-	elevatedRole?: ElevatedRole,
+	elevatedRole: ElevatedRole,
 	autoclear?: number
 }
 
 export enum ElevatedRole {
-	NONE,
+	MEMBER,
 	MODERATOR,
 	ADMIN,
 	EXECUTIVE,
@@ -46,7 +46,7 @@ export default class Command {
 		this.client = client
 		this.name = options.name
 		this.description = options.description || options.name;
-		this.elevatedRole = options.elevatedRole || ElevatedRole.NONE;
+		this.elevatedRole = options.elevatedRole;
 		this.autoclear = options.autoclear || -1;
 		this.autoclearOverride = new Map<string, number>();
 	}
@@ -61,7 +61,7 @@ export default class Command {
 	 * @abstract
 	 * @throws {CommandUnimplementedError}
 	 */
-	async textCommand(_message: Message, _args: String[]): Promise<MessageCreateOptions> {
+	async textCommand(_message: Message, _args: String[]): Promise<MessageCreateOptions | null> {
 		throw new CommandUnimplementedError(this.name);
 	}
 
@@ -79,15 +79,18 @@ export default class Command {
 		const elevationRoleMap = this.client.elevated_roles;
 		const requiredId = elevationRoleMap.get(this.elevatedRole);
 
+		if (!requiredId)
+			return false;
+		
 		// While the maintainer is working on commands, they should be able to use them
-		if (member.id === elevationRoleMap.get(ElevatedRole.MAINTAINER))
-			return true; // Comment out after testing is complete
+		// if (member.id === elevationRoleMap.get(ElevatedRole.MAINTAINER))
+		// 	return true; // Comment out after testing is complete
 
 		switch (this.elevatedRole) {
-			case ElevatedRole.NONE:
+			case ElevatedRole.MEMBER:
 				return true
 			case ElevatedRole.MAINTAINER: // Is steve
-				return member.id === requiredId;
+				return member.id === this.client.maintainer;
 			default:
 				return memberRoles.has(requiredId);
 		}

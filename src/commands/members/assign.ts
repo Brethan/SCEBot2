@@ -6,7 +6,7 @@ export default class Assign extends Command {
 	constructor(client: SCESocClient) {
 		super(client, {
 			name: "assign",
-			elevatedRole: ElevatedRole.NONE,
+			elevatedRole: ElevatedRole.MEMBER,
 			autoclear: 5_000
 		})
 	}
@@ -15,6 +15,8 @@ export default class Assign extends Command {
 		const { aliasToProgram } = this.client;
 		const { roles } = this.client.config.channels;
 		const { member } = message;
+
+		if (!member) throw new Error();
 		
 		// No args provided or user gave bad args
 		if (!args.length || !aliasToProgram.has(args[0])) {
@@ -23,8 +25,12 @@ export default class Assign extends Command {
 
 		// Find role and give to user
 		const roleName = aliasToProgram.get(args[0]);
-		const role = message.guild.roles.cache.find(r => r.name === roleName);
+		const role = message.guild?.roles.cache.find(r => r.name === roleName);
+
+		if (!role) throw new Error();
+
 		await member.roles.add(role);
+		await message.react("👍");
 
 		return {content: "You have been assigned the " + roleName + " role"};
 	}

@@ -12,6 +12,8 @@ export default class Guild extends Command {
 	}
 
 	async textCommand(message: Message): Promise<MessageCreateOptions> {
+		if (!message.guild)	throw new Error();
+
 		this.client.config.guild_id = message.guild.id;
 		this.client.overwriteConfig();
 

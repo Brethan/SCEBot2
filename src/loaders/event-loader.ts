@@ -18,6 +18,9 @@ module.exports = async (client: SCESocClient) => {
 			const event = require(resolve(eventPath, file));
 			const eventName = file.split('.').at(0);
 			
+			if (!eventName)
+				continue;
+				
 			client.on(eventName, event.bind(null, client));
 		}	
 

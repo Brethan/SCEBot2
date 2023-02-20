@@ -25,11 +25,12 @@ export const check_config = () => {
 			"maintainer": "",
 			"moderator": "",
 			"admin": "",
-			"exec": ""
+			"exec": "",
+			"member": ""
 		}
 	};
 
-	let config = {};
+	let config;
 
 	// Check if config exists and has all required entries
 	if (existsSync(resolve("./", "config.json"))) {
@@ -37,7 +38,8 @@ export const check_config = () => {
 		for (const key in template) {
 			if (config[key])
 				continue;
-
+				
+			//@ts-ignore
 			config[key] = template[key];
 		}
 
