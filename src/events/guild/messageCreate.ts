@@ -52,8 +52,8 @@ const commandHandler = async (client: SCESocClient, message: Message) => {
 	
 	try { // Run command and send the response
 		const output = await command.textCommand(message, args);
-		if (!output) return;
-		
+		if (!output) return true;
+
 		const response = await message.channel.send(output);
 		const { id } = member;
 
