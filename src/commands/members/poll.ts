@@ -8,7 +8,7 @@ export default class Poll extends Command {
 	constructor(client: SCESocClient) {
 		super(client, {
 			name: "poll",
-			elevatedRole: ElevatedRole.MAINTAINER,
+			elevatedRole: ElevatedRole.NONE,
 			autoclear: 5_000
 		})
 
