@@ -72,7 +72,8 @@ export default class Poll extends Command {
 		const reactions = prompt.createReactionCollector({
 			filter: (reaction, user) => {
 				const { name } = reaction.emoji;
-				return !!name && !user.bot && this.emojis.includes(name);
+				return !!name && !user.bot 
+					&& (this.emojis.includes(name) || name === terminateEmoji);
 			}, time: duration * 1000
 		});
 
