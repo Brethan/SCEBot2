@@ -1,5 +1,4 @@
-import { AwaitMessagesOptions, Colors, Embed, EmbedBuilder, EmbedData, Emoji, EmojiIdentifierResolvable, Message, MessageCreateOptions, TextChannel } from "discord.js";
-import { userInfo } from "os";
+import { AwaitMessagesOptions, Colors, EmbedBuilder, EmojiIdentifierResolvable, Message, MessageCreateOptions, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
 import Command, { ElevatedRole } from "../Command";
 
