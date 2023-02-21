@@ -1,5 +1,5 @@
 import { resolve } from "path";
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 
 export const check_env = () => {
 	if (!existsSync(resolve("./", ".env"))) {
