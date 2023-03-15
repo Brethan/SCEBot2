@@ -6,7 +6,7 @@ check_config();
 
 import { GatewayIntentBits } from "discord.js";
 require("dotenv").config();
-
+ 
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
