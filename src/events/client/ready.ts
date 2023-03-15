@@ -43,7 +43,7 @@ module.exports = async (client: SCESocClient) => {
 		if (error instanceof Error)
 			console.log("Member routine exited with an error: " + error.message);
 	}
-	
+	 
 	console.timeEnd("Member update routine");
 	console.log(`${client.user.tag} is ready!`);
 }
