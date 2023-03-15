@@ -5,7 +5,7 @@ import Command, { ElevatedRole } from "../Command";
 export default class Guild extends Command {
 	constructor(client: SCESocClient) {
 		super(client, {
-			name: "guild",
+			name: "gitpull",
 			elevatedRole: ElevatedRole.MAINTAINER,
 			autoclear: 3_000
 		})
