@@ -40,7 +40,8 @@ module.exports = async (client: SCESocClient) => {
 		await update.edit({ content: update.content.replace("ing", "ed") })
 		
 	} catch (error) {
-		console.log("Member routine exited with an error.");
+		if (error instanceof Error)
+			console.log("Member routine exited with an error: " + error.message);
 	}
 	
 	console.timeEnd("Member update routine");
