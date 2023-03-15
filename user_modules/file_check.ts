@@ -1,5 +1,5 @@
 import { resolve } from "path";
-import { existsSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 
 export const check_env = () => {
 	if (!existsSync(resolve("./", ".env"))) {
@@ -34,7 +34,7 @@ export const check_config = () => {
 
 	// Check if config exists and has all required entries
 	if (existsSync(resolve("./", "config.json"))) {
-		config = require("../config.json");
+		config = JSON.parse(readFileSync(resolve("./", "config.json"), "utf8"));
 		for (const key in template) {
 			if (config[key])
 				continue;

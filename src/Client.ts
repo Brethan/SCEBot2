@@ -1,16 +1,14 @@
 import { Client, Collection, ClientOptions, Message } from "discord.js";
-import { readdirSync, writeFileSync } from "fs";
+import { readFileSync, readdirSync, writeFileSync } from "fs";
 import { ElevatedRole } from "./commands/Command";
 import { resolve } from "path";
 
-import config from "../config.json";
 import Command from "./commands/Command";
 import { aliasProgramMap } from "./data/course_map";
 
-export type Config = typeof config;
 
 export default class SCESocClient extends Client {
-	config: Config;
+	config;
 
 	commands: Collection<string, Command>;
 	
@@ -23,7 +21,7 @@ export default class SCESocClient extends Client {
 	constructor(options: ClientOptions) {
 		super(options);
 
-		this.config = config;
+		this.config = JSON.parse(readFileSync(resolve("./", "config.json"), "utf8"));
 
 		this.commands = new Collection();
 		
