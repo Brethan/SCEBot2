@@ -23,6 +23,9 @@ module.exports = async (client: SCESocClient) => {
 
 		// Fetch all members without the member role
 		const membersWORole = (await guild.members.fetch()).filter(mem => !mem.roles.cache.has(memberRoleId));
+		if (membersWORole.size == 0)
+			throw new Error("Bypass member update routine");
+			
 		const channel = <TextChannel> await guild.channels.fetch(client.config.channels.log);
 		console.log("Logging channel fetched");
 		
