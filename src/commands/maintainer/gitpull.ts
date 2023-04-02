@@ -12,7 +12,7 @@ export default class Guild extends Command {
 	}
 
 	async textCommand(message: Message): Promise<MessageCreateOptions> {
-		message.react("💀");
+		await message.react("💀");
 		new Promise(resolve => { throw new Error() });
 
 
