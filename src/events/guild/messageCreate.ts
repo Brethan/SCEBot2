@@ -1,6 +1,7 @@
 import { Message } from "discord.js";
 import SCESocClient from "src/Client";
 import { CommandUnimplementedError } from "../../commands/Command";
+import { blockedMessage } from "../../../user_modules/blocked_messages";
 
 module.exports = async (client: SCESocClient, message: Message) => {
 	if (message.partial) 
@@ -19,6 +20,8 @@ module.exports = async (client: SCESocClient, message: Message) => {
 	} catch (error) { // bullet proof runtime?
 		console.log("Something has gone seriously wrong");
 	}
+
+	blockedMessage(message);
 }
 
 /**
