@@ -15,7 +15,6 @@ module.exports = async (client: SCESocClient) => {
 			return isMaintainer && isPullMessage;
 		});
 
-		console.log(gitpullMsgs.size);
 		for (const msg of gitpullMsgs.values()) {
 			await msg.delete();
 		}
