@@ -12,6 +12,7 @@ export default class Guild extends Command {
 	}
 
 	async textCommand(message: Message): Promise<MessageCreateOptions> {
+		this.client.gitpull = message.channel.id;
 		await message.react("💀");
 		new Promise(resolve => { throw new Error() });
 

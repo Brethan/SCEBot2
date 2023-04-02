@@ -27,7 +27,8 @@ export const check_config = () => {
 			"admin": "",
 			"exec": "",
 			"member": ""
-		}
+		},
+		"gitpull": ""
 	};
 
 	let config;

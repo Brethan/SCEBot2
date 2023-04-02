@@ -99,6 +99,16 @@ export default class SCESocClient extends Client {
 		}
 	}
 
+	set gitpull(msgId: string) {
+		this.config.gitpull = msgId;
+		this.overwriteConfig();
+	}
+
+	get gitpull() {
+		const temp = this.config.gitpull;
+		return temp;
+	}
+
 	overwriteConfig() {
 		const overwrite = JSON.stringify(this.config, null, 4);
 		writeFileSync("./config.json", overwrite);

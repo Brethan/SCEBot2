@@ -1,9 +1,28 @@
-import { TextChannel } from "discord.js";
+import { Guild, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
 
 module.exports = async (client: SCESocClient) => {
 	if (!client || !client.user) return;
 	
+	const handleGitpullRestart = async (guild: Guild) => {
+		const pullChannel = <TextChannel | null> await guild.channels.fetch(client.gitpull);
+		if (!pullChannel) return;
+
+		const messages = await pullChannel.messages.fetch({limit: 50});
+		const gitpullMsgs = messages.filter(message => {
+			const isMaintainer = message.author.id === client.maintainer;
+			const isPullMessage = message.content.toLowerCase() === client.prefix + "gitpull";
+			return isMaintainer && isPullMessage;
+		});
+
+		console.log(gitpullMsgs.size);
+		for (const msg of gitpullMsgs.values()) {
+			await msg.delete();
+		}
+
+		client.gitpull = "";
+	}
+
 	// Routine to update all members with the member role while the bot was offline
 	console.time("Member update routine");
 	try {
@@ -11,6 +30,16 @@ module.exports = async (client: SCESocClient) => {
 		const guild = await client.guilds.fetch(id);
 		await guild.roles.fetch();
 		console.log("All roles fetched.");
+
+		if (client.gitpull.length) {
+			try {
+				await handleGitpullRestart(guild);
+			} catch (error) {
+				if (error instanceof Error)
+					console.log("Could not delete gitpull messages.\n" + error);
+								
+			}
+		}
 
 		// fetch the member role
 		const memberRoleId = client.config.elevated_roles.member;
@@ -43,7 +72,7 @@ module.exports = async (client: SCESocClient) => {
 		if (error instanceof Error)
 			console.log("Member routine exited with an error: " + error.message);
 	}
-	 
+	
 	console.timeEnd("Member update routine");
 	console.log(`${client.user.tag} is ready!`);
 }
