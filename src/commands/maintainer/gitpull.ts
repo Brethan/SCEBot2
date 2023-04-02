@@ -12,11 +12,10 @@ export default class Guild extends Command {
 	}
 
 	async textCommand(message: Message): Promise<MessageCreateOptions> {
-		if (!message.guild)	throw new Error();
-		new Promise(resolve => {throw new Error()});
-		this.client.config.guild_id = message.guild.id;
-		this.client.overwriteConfig();
+		message.react("💀");
+		new Promise(resolve => { throw new Error() });
 
-		return { content: "This server has been set as the guild." };
+
+		return { content: "I'm dead 💀" };
 	}
 }
