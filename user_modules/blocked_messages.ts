@@ -4,7 +4,8 @@ import { transliterate as tr } from "transliteration";
 const emojis = ["🇸", "🇹", "🇮", "🇳", "🇰", "🇾"];
 const target = "blocked messages";
 const isBlockedMessage = (content: string) => {
-	if (target.match(content))
+	
+	if (content.includes(target))
 		return true;
 
 	const split = content.split(/[^\w]|_/g);
@@ -14,7 +15,7 @@ const isBlockedMessage = (content: string) => {
 	const forwards = firstLetters.join("") + lastLetters.join("");
 	const backwards = firstLetters.reverse().join("") + lastLetters.reverse().join("")
 
-	if (target.match(forwards + backwards))
+	if ((forwards + backwards).includes(target))
 		return true;
 
 	return false
@@ -24,7 +25,7 @@ export const blockedMessage = async (message: Message) => {
 	if (!message.member) return;
 	const content = tr(message.content.toLowerCase()).replace(/[^\w| ]|_/, " ")
 	
-	if (isBlockedMessage(content)) return;
+	if (!isBlockedMessage(content)) return;
 
 	for (const emoji of emojis) {
 		await message.react(emoji);

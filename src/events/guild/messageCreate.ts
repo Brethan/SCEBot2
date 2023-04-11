@@ -17,11 +17,11 @@ module.exports = async (client: SCESocClient, message: Message) => {
 			return;
 		}
 
+		await blockedMessage(message);
 	} catch (error) { // bullet proof runtime?
 		console.log("Something has gone seriously wrong");
 	}
 
-	blockedMessage(message);
 }
 
 /**
