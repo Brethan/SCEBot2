@@ -22,7 +22,6 @@ const isBlockedMessage = (content: string) => {
 }
 
 export const blockedMessage = async (message: Message) => {
-	if (!message.member) return;
 	const content = tr(message.content.toLowerCase()).replace(/[^\w| ]|_/, " ")
 	
 	if (!isBlockedMessage(content)) return;
@@ -30,4 +29,7 @@ export const blockedMessage = async (message: Message) => {
 	for (const emoji of emojis) {
 		await message.react(emoji);
 	}
+
+	await new Promise(resolve => setTimeout(resolve, 5_000));
+	await message.reactions.removeAll();
 }
