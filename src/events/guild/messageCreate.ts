@@ -20,6 +20,7 @@ module.exports = async (client: SCESocClient, message: Message) => {
 		await blockedMessage(message);
 	} catch (error) { // bullet proof runtime?
 		console.log("Something has gone seriously wrong");
+		console.error(error)
 	}
 
 }
