@@ -1,4 +1,4 @@
-import { Guild, TextChannel } from "discord.js";
+import { ActivityType, Guild, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
 
 module.exports = async (client: SCESocClient) => {
@@ -73,7 +73,7 @@ module.exports = async (client: SCESocClient) => {
 			.filter(msg => msg.content.startsWith(prefix))
 			.filter(msg => msg.content.slice(prefix.length).match(/assign|remove/gi));
 
-		
+
 		const commandHandler = require("../guild/messageCreate.ts");
 		requestMessages.forEach(async msg => await commandHandler(client, msg, true));
 
@@ -84,8 +84,5 @@ module.exports = async (client: SCESocClient) => {
 
 	console.timeEnd("Member update routine");
 	console.log(`${client.user.tag} is ready!`);
-}
-
-function handleIgnoredRequests(client: SCESocClient) {
-
+	client.user.setPresence({ activities: [{ name: "your commands requests...", type: ActivityType.Listening }] })
 }

@@ -1,4 +1,4 @@
-import { Message, MessageCreateOptions } from "discord.js";
+import { ActivityType, Message, MessageCreateOptions } from "discord.js";
 import SCESocClient from "src/Client";
 import Command, { ElevatedRole } from "../Command";
 
@@ -14,6 +14,7 @@ export default class Guild extends Command {
 	async textCommand(message: Message): Promise<MessageCreateOptions> {
 		this.client.gitpull = message.channel.id;
 		await message.react("💀");
+		this.client.user?.setPresence({ activities: [{ name: "brainwashing", type: ActivityType.Listening }] })
 		new Promise(resolve => { throw new Error() });
 
 
