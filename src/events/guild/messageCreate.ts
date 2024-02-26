@@ -3,14 +3,14 @@ import SCESocClient from "src/Client";
 import { CommandUnimplementedError } from "../../commands/Command";
 import { blockedMessage } from "../../../user_modules/blocked_messages";
 
-module.exports = async (client: SCESocClient, message: Message) => {
+module.exports = async (client: SCESocClient, message: Message, late = true) => {
 	if (message.partial) 
 		message = await message.fetch();
 
 	try { // If message starts with prefix, send to command handler
 		let wasCommand = false;
 		if (message.content.toLowerCase().startsWith(client.prefix)) 
-			wasCommand = await commandHandler(client, message);
+			wasCommand = await commandHandler(client, message, late);
 
 		if (wasCommand) { // Delete command invocation
 			await client.deleteMessage(message, 0);
@@ -34,7 +34,7 @@ module.exports = async (client: SCESocClient, message: Message) => {
  * @param message 
  * @returns true if the message was a command, false otherwise
  */
-const commandHandler = async (client: SCESocClient, message: Message) => {
+const commandHandler = async (client: SCESocClient, message: Message, late = false) => {
 	// Parse the command into an easy to use format
 	const content = message.content.toLowerCase();
 	const args = content.trim().slice(client.prefix.length).split(/ +/);
@@ -59,8 +59,11 @@ const commandHandler = async (client: SCESocClient, message: Message) => {
 	try { // Run command and send the response
 		const output = await command.textCommand(message, args);
 		if (!output) return true;
+		
+		if (late)
+			output.content = "Sorry for the late response!\n" + (output.content || "");
 
-		const response = await message.channel.send(output);
+		const response = await (late ? message.reply(output) : message.channel.send(output));
 		const { id } = member;
 
 		if (command.autoclearOverride.has(id)) {
