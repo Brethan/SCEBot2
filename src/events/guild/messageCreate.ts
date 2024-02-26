@@ -3,7 +3,7 @@ import SCESocClient from "src/Client";
 import { CommandUnimplementedError } from "../../commands/Command";
 import { blockedMessage } from "../../../user_modules/blocked_messages";
 
-module.exports = async (client: SCESocClient, message: Message, late = true) => {
+module.exports = async (client: SCESocClient, message: Message, late = false) => {
 	if (message.partial) 
 		message = await message.fetch();
 
