@@ -2,7 +2,7 @@ import { CategoryChannel, EmbedBuilder, Message, MessageCreateOptions, TextChann
 import SCESocClient from "src/Client";
 import Command, { ElevatedRole } from "../Command";
 
-export default class Assign extends Command {
+export default class ServerInfo extends Command {
 	constructor(client: SCESocClient) {
 		super(client, {
 			name: "serverinfo",
