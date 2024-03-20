@@ -26,7 +26,7 @@ export default class Avatar extends Command {
 			if (!target) 
 				return { content: "Let's mention someone shall we?" };
 
-			imageUrl = target.displayAvatarURL();
+			imageUrl = target.displayAvatarURL({ size: 256 });
 			name = target.user.username;
 		}
 		
