@@ -11,35 +11,26 @@ export default class Avatar extends Command {
 	}
 
 	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
-		const { member, guild } = message;
+		// Select between the command invoker or the invoker's target
+		const { member } = message;
+		const mentioned = message.mentions.members?.first();
+		const target = (!args.length || args.length > 1) ? member : mentioned;
 
-		if (!member || !guild) throw new Error();
+		// Resort to the generic error message if something went wrong
+		if (!target) throw new Error();
 		
-		const options: ImageURLOptions = { size: 512, extension: "png", forceStatic: false };
-
-		let imageUrl: string = "";
-		let name: string = "";
-		if (!args.length || args.length > 1) {
-			imageUrl = member.displayAvatarURL(options);
-			name = member.user.username;
-		} else if (args.length == 1) {
-			const target = message.mentions.members?.first();
-			if (!target) 
-				return { content: "Let's mention someone shall we?" };
-
-			imageUrl = target.displayAvatarURL(options);
-			name = target.user.username;
-		}
+		// Collection server avatar and display name of the target
+		const imageUrl = target.displayAvatarURL({ size: 512, extension: "png", forceStatic: false });
+		const name = target.displayName;
 		
+		// Generate and return the embed to send back to the invoker
 		const embed = new EmbedBuilder()
 			.setDescription("**Server Avatar**")
 			.setColor("Yellow")
 			.setImage(imageUrl)
-			.setAuthor({ name, iconURL: imageUrl });
+			.setAuthor({ name: name, iconURL: imageUrl });
 
 
 		return { embeds: [embed] };
-
-
 	}
 }
