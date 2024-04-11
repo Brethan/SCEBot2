@@ -104,6 +104,26 @@ export default class SCESocClient extends Client {
 		await new Promise(resolve => setTimeout(resolve, delay));
 	}
 
+	#log(message: string) {
+		console.log(`[${(new Date()).toISOString()}] ${message}`);
+	}
+
+	logWarning(message: string) {
+		this.#log("WARNING: " + message);
+	}
+	
+	logNotice(message: string) {
+		this.#log("NOTICE: " + message);
+	}
+	
+	logError(message: string) {
+		this.#log("ERROR: " + message);
+	}
+	
+	logInfo(message: string) {
+		this.#log("INFO: " + message);
+	}
+
 	/**
 	 * Deletes a message after a certain delay. If no delay is passed,
 	 * the message will be deleted after 5 seconds by default.

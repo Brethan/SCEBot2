@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Invite, Message, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
 import { CommandUnimplementedError } from "../../commands/Command";
 import { blockedMessage } from "../../../user_modules/blocked_messages";
@@ -30,22 +30,35 @@ module.exports = async (client: SCESocClient, message: Message, late = false) =>
 
 async function hasUnauthorizedDiscordLink(client: SCESocClient, message: Message): Promise<boolean> {
 	const { member } = message;
-	
-	if (!member || !message.content.match(/discord.gg\/[a-zA-Z0-9]{7,10}/gi)) {
+	const channel = <TextChannel> message.channel; 
+	const inviteMatch = message.content.match(Invite.InvitesPattern);
+	if (!member || !inviteMatch?.input) {
 		return false;
 	}
+
+	const invite = await client.fetchInvite(inviteMatch.input)
+	const inviteInfo = `@${member.displayName} in #${channel.name}    [Invite to ${invite.guild?.name}: ${invite.url}]`;
 
 	if (client.isMemberModerator(member)) {
+		client.logNotice(`Discord Link Detected - Sent by server staff ${inviteInfo}`);
 		return false;
 	}
 	
+	if (invite.guild === message.guild) {
+		client.logNotice(`Discord Link Detected - Invite to this server ${inviteInfo}`);
+		return false;
+	}
+
+	const content = "Please do not share Discord invite links on the SCESoc server!"
+		+ "\nIf you would still like to share this link, please ask a moderator or any other staff."
+		+ "\nWe apologize for any inconvenience this causes!";
+
+	const reply = await message.reply({ content: content });
 	await client.deleteMessage(message, 0);
 
-	const reply = "Please do not share Discord invite links on the SCESoc server!"
-		+ "\nIf you would still like to share this link, please ask a moderator or any other staff."
-		+ "\nWe apologize for any inconvenience this causes!"; 
-	client.deleteMessage(await message.reply(reply), 10_000);
-	
+	client.deleteMessage(reply, 10_000);
+	client.logNotice(`Discord Link Detected - Sent by a server member ${inviteInfo}`);
+
 	
 	return true;
 }
