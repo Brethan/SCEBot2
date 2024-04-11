@@ -91,6 +91,8 @@ const commandHandler = async (client: SCESocClient, message: Message, late = fal
 		const response = await (late ? message.reply(output) : message.channel.send(output));
 		const { id } = member;
 
+		// If member has an override set, wait until then to delete message
+		// E.g arguments rejected
 		if (command.autoclearOverride.has(id)) {
 			const autoclear = command.autoclearOverride.get(id)
 			command.autoclearOverride.delete(id)

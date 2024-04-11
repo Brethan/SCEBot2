@@ -11,7 +11,7 @@ export default class Poll extends Command {
 			autoclear: 5_000
 		})
 
-		this.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"] satisfies EmojiIdentifierResolvable[];
+		this.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]; //satisfies EmojiIdentifierResolvable[];
 	}
 
 	/**
@@ -37,7 +37,7 @@ export default class Poll extends Command {
 	}
 
 	async poll(message: Message, title: string, prompt: Message, pollOptions: string[], duration: number) {
-		const terminateEmoji = "🚫" satisfies EmojiIdentifierResolvable;
+		const terminateEmoji = "🚫";// satisfies EmojiIdentifierResolvable;
 		// Build poll embed
 		let description = "To vote, react using the emojis below.";
 		description += "\nThe poll has been set to end after " + duration + " seconds."
