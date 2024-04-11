@@ -1,4 +1,4 @@
-import { Client, Collection, ClientOptions, Message } from "discord.js";
+import { Client, Collection, ClientOptions, Message, GuildMember } from "discord.js";
 import { readFileSync, readdirSync, writeFileSync } from "fs";
 import { ElevatedRole } from "./commands/Command";
 import { resolve } from "path";
@@ -69,6 +69,31 @@ export default class SCESocClient extends Client {
 
 	get member(): string {
 		return this.config.elevated_roles.member;
+	}
+
+	isMemberModerator(member: GuildMember): boolean {
+		if (this.isMemberAdmin(member) || this.isMemberExec(member) || this.isMemberMaintainer(member))
+			return true;
+
+		return member.roles.cache.some(r => r.id === this.moderator);
+	}
+
+	isMemberAdmin(member: GuildMember): boolean {
+		if (this.isMemberExec(member) || this.isMemberMaintainer(member))
+			return true;
+
+		return member.roles.cache.some(r => r.id === this.admin);
+	}
+
+	isMemberExec(member: GuildMember): boolean {
+		if (this.isMemberMaintainer(member))
+			return true;
+
+		return member.roles.cache.some(r => r.id === this.exec);
+	}
+
+	isMemberMaintainer(member: GuildMember): boolean {
+		return this.maintainer === member.id;
 	}
 
 	/**

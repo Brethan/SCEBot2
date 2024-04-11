@@ -7,6 +7,9 @@ module.exports = async (client: SCESocClient, message: Message, late = false) =>
 	if (message.partial) 
 		message = await message.fetch();
 
+	if (await hasUnauthorizedDiscordLink(client, message)) {
+		return;
+	}
 	try { // If message starts with prefix, send to command handler
 		let wasCommand = false;
 		if (message.content.toLowerCase().startsWith(client.prefix)) 
@@ -23,6 +26,28 @@ module.exports = async (client: SCESocClient, message: Message, late = false) =>
 		console.error(error)
 	}
 
+}
+
+async function hasUnauthorizedDiscordLink(client: SCESocClient, message: Message): Promise<boolean> {
+	const { member } = message;
+	
+	if (!member || !message.content.match(/discord.gg\/[a-zA-Z0-9]{7,10}/gi)) {
+		return false;
+	}
+
+	if (client.isMemberModerator(member)) {
+		return false;
+	}
+	
+	await client.deleteMessage(message, 0);
+
+	const reply = "Please do not share Discord invite links on the SCESoc server!"
+		+ "\nIf you would still like to share this link, please ask a moderator or any other staff."
+		+ "\nWe apologize for any inconvenience this causes!"; 
+	client.deleteMessage(await message.reply(reply), 10_000);
+	
+	
+	return true;
 }
 
 /**
