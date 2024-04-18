@@ -3,9 +3,9 @@ import SCESocClient from "src/Client";
 
 module.exports = async (client: SCESocClient, message: Message) => {
 	try {
-		if (!message || !message.content || !message.author)
+		if (!message || !message.content || !message.author || message.author.bot)
 			return;
-		
+
 		// Don't log if it's a text command invocation  
 		if (message.content.startsWith(client.prefix))
 			return;

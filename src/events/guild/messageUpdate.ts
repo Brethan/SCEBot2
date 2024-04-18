@@ -3,7 +3,7 @@ import SCESocClient from "src/Client";
 
 module.exports = async (client: SCESocClient, oldMessage: Message, newMessage: Message) => {
 	try {
-		if (!oldMessage || !oldMessage.content || !oldMessage.author)
+		if (!oldMessage || !oldMessage.content || !oldMessage.author || oldMessage.author.bot)
 			return;
 
 		const embed = new EmbedBuilder()
