@@ -9,13 +9,13 @@ module.exports = async (client: SCESocClient, oldMessage: Message, newMessage: M
 		const embed = new EmbedBuilder()
 			.setAuthor({ name: oldMessage.author.username, iconURL: oldMessage.author.displayAvatarURL() })
 			.setDescription(`**Message Edited by ${oldMessage.author} in ${oldMessage.channel}**\n`
-			+ `**Before**\n`
-			+ `Contents: ${oldMessage.content}\n`
-			+ `Attachments: ${oldMessage.attachments.size}\n\n`
-			+ `**After**\n`
-			+ `Contents: ${newMessage.content}\n`
-			+ `Attachments: ${newMessage.attachments.size}\n`
-		)
+				+ `**Before**\n`
+				+ `Contents: ${oldMessage.content}\n`
+				+ `Attachments: ${oldMessage.attachments.size}\n\n`
+				+ `**After**\n`
+				+ `Contents: ${newMessage.content}\n`
+				+ `Attachments: ${newMessage.attachments.size}\n`
+			)
 			.setFooter({
 				text: `Author: ${oldMessage.author.id} | Message ID: ${oldMessage.id} |`
 			}).setColor("Yellow")
