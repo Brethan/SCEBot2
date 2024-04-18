@@ -3,7 +3,7 @@ import SCESocClient from "src/Client";
 import { CommandUnimplementedError } from "../../commands/Command";
 import { blockedMessage } from "../../../user_modules/blocked_messages";
 
-module.exports = async (client: SCESocClient, message: Message, late = false) => {
+module.exports = async (client: SCESocClient, message: Message) => {
 	if (message.partial) 
 		message = await message.fetch();
 
@@ -13,7 +13,7 @@ module.exports = async (client: SCESocClient, message: Message, late = false) =>
 	try { // If message starts with prefix, send to command handler
 		let wasCommand = false;
 		if (message.content.toLowerCase().startsWith(client.prefix)) 
-			wasCommand = await commandHandler(client, message, late);
+			wasCommand = await commandHandler(client, message);
 
 		if (wasCommand) { // Delete command invocation
 			await client.deleteMessage(message, 0);

@@ -1,4 +1,4 @@
-import { Client, Collection, ClientOptions, Message, GuildMember } from "discord.js";
+import { Client, Collection, ClientOptions, Message, GuildMember, TextChannel, BaseGuildTextChannel } from "discord.js";
 import { readFileSync, readdirSync, writeFileSync } from "fs";
 import { ElevatedRole } from "./commands/Command";
 import { resolve } from "path";
@@ -6,12 +6,40 @@ import { resolve } from "path";
 import Command from "./commands/Command";
 import { aliasProgramMap } from "./data/course_map";
 
+interface Channels {
+	[key: string]: string,
+	log: string,
+	roles: string,
+	lobby: string,
+	interact: string,
+	reception: string,
+	announcement: string
+}
+
+interface IElevatedRole {
+	maintainer: string,
+	moderator: string,
+	admin: string,
+	exec: string,
+	member: string
+}
+
+interface Config {
+	prefix: string,
+	elevated_roles: IElevatedRole,
+	channels: Channels,
+	guild_id: string,
+	gitpull: string
+}
 
 export default class SCESocClient extends Client {
-	config;
+	config: Config;
 
 	commands: Collection<string, Command>;
 	
+	/** @readonly */
+	specialChannels: Collection<string, BaseGuildTextChannel>;
+
 	/** @readonly */
 	elevated_roles: Map<ElevatedRole, string>;
 
@@ -34,6 +62,7 @@ export default class SCESocClient extends Client {
 
 		this.aliasToProgram = aliasProgramMap;
 		
+		this.specialChannels = new Collection<string, BaseGuildTextChannel>();
 		this.initLoaders();
 	}
 
@@ -43,6 +72,28 @@ export default class SCESocClient extends Client {
 			.filter(f => f.endsWith("loader.ts"))
 			.forEach(async loader_name => require(`./loaders/${loader_name}`)(this))
 	}
+
+	get logChannel() {
+		return <BaseGuildTextChannel>this.specialChannels.get(this.config.channels.log);
+	}
+	
+	get rolesChannel(): BaseGuildTextChannel {
+		return <BaseGuildTextChannel>this.specialChannels.get(this.config.channels.roles);
+	}
+	
+	get lobbyChannel() {
+		return <BaseGuildTextChannel>this.specialChannels.get(this.config.channels.lobby);
+	}
+	
+	get receptionChannel() {
+		return <BaseGuildTextChannel>this.specialChannels.get(this.config.channels.reception);
+	}
+
+	get announcementChannel() {
+		return <BaseGuildTextChannel>this.specialChannels.get(this.config.channels.announcement);
+	}
+
+	
 	
 	/**
 	 * @readonly
@@ -106,6 +157,10 @@ export default class SCESocClient extends Client {
 
 	#log(message: string) {
 		console.log(`[${(new Date()).toISOString()}] ${message}`);
+	}
+
+	debug(message: string) {
+		this.#log("DEBUG: " + message);
 	}
 
 	logWarning(message: string) {
