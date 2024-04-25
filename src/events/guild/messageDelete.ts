@@ -1,4 +1,4 @@
-import { EmbedBuilder, Message } from "discord.js";
+import { EmbedBuilder, Message, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
 
 module.exports = async (client: SCESocClient, message: Message) => {
@@ -20,7 +20,7 @@ module.exports = async (client: SCESocClient, message: Message) => {
 			}).setColor("Yellow")
 			.setTimestamp();
 
-		await client.logChannel.send({ embeds: [embed] });
+		await client.serverLog({ embeds: [embed] }, <TextChannel>message.channel);
 	} catch (error) {
 		if (error instanceof Error)
 			client.logError(error.stack || error.message);

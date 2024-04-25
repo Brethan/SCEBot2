@@ -1,4 +1,4 @@
-import { Client, Collection, ClientOptions, Message, GuildMember, TextChannel, BaseGuildTextChannel } from "discord.js";
+import { Client, Collection, ClientOptions, Message, GuildMember, TextChannel, BaseGuildTextChannel, MessageCreateOptions, PermissionsBitField } from "discord.js";
 import { readFileSync, readdirSync, writeFileSync } from "fs";
 import { ElevatedRole } from "./commands/Command";
 import { resolve } from "path";
@@ -73,11 +73,21 @@ export default class SCESocClient extends Client {
 			.forEach(async loader_name => require(`./loaders/${loader_name}`)(this))
 	}
 
+	async serverLog(payload: MessageCreateOptions, channel: TextChannel) { 
+		if (!channel.permissionsFor(this.moderator)?.has(PermissionsBitField.Flags.ViewChannel))
+			return this.logNotice("Message event occurred in a non-moderator channel.");
+		if (this.prefix === ")") {
+			payload.content = "This is a development log.";
+		}
+
+		return await this.logChannel.send(payload);
+	}
+
 	get logChannel() {
 		return <BaseGuildTextChannel>this.specialChannels.get(this.config.channels.log);
 	}
 	
-	get rolesChannel(): BaseGuildTextChannel {
+	get rolesChannel() {
 		return <BaseGuildTextChannel>this.specialChannels.get(this.config.channels.roles);
 	}
 	
