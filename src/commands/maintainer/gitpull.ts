@@ -15,7 +15,7 @@ export default class Guild extends Command {
 		this.client.gitpull = message.channel.id;
 		await message.react("💀");
 		this.client.user?.setPresence({ activities: [{ name: "brainwashing", type: ActivityType.Listening }] })
-		new Promise(resolve => { throw new Error() });
+		new Promise(_ => { throw new Error() });
 
 
 		return { content: "I'm dead 💀" };

@@ -32,13 +32,20 @@ async function hasUnauthorizedDiscordLink(client: SCESocClient, message: Message
 	const { member } = message;
 	const channel = <TextChannel> message.channel; 
 	const inviteMatch = message.content.match(Invite.InvitesPattern);
-	if (!member || !inviteMatch?.input) {
+	
+	// Return if there is something wrong with the data 
+	if (!member || !member.joinedTimestamp) {
+		return false;
+	}
+
+	// If there are no invite matches, return
+	if (!inviteMatch?.input) {
 		return false;
 	}
 
 	const invite = await client.fetchInvite(inviteMatch.input)
 	const inviteInfo = `@${member.displayName} in #${channel.name}    [Invite to ${invite.guild?.name}: ${invite.url}]`;
-
+	
 	if (client.isMemberModerator(member)) {
 		client.logNotice(`Discord Link Detected - Sent by server staff ${inviteInfo}`);
 		return false;
@@ -49,10 +56,23 @@ async function hasUnauthorizedDiscordLink(client: SCESocClient, message: Message
 		return false;
 	}
 
-	const content = "Please do not share Discord invite links on the SCESoc server!"
-		+ "\nIf you would still like to share this link, please ask a moderator or any other staff."
-		+ "\nWe apologize for any inconvenience this causes!";
+	// Immediately timeout members who have been in the server for less than 3 days 
+	const CUTOFF = 3;
+	const timeSinceJoined = message.createdTimestamp - member.joinedTimestamp;
+	const msPerDay = 1000 * 60 * 60 * 24;
 
+	const timeoutMember = Math.floor(timeSinceJoined / msPerDay) <= CUTOFF;
+	const timeoutMessage = "\n\nYou have been timed out for 30 minutes.";
+
+	const content = "Please do not share Discord invite links on the SCESoc server!"
+		+ "\nIf you would still like to share this link, please ask the VP Publications,"
+		+ " a moderator, or any other staff."
+		+ "\nWe apologize for any inconvenience this causes!"
+		+ (timeoutMember ? timeoutMessage : "");
+
+	// Timeout the member for 30 minutes
+	const TIMEOUT_TIME = 30 * 60 * 1000;
+	await member.timeout(TIMEOUT_TIME, "User sent a discord server invite link within 3 days of joining the server.");
 	const reply = await message.reply({ content: content });
 	await client.deleteMessage(message, 0);
 
