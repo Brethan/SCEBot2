@@ -57,12 +57,15 @@ async function hasUnauthorizedDiscordLink(client: SCESocClient, message: Message
 	}
 
 	// Immediately timeout members who have been in the server for less than 3 days 
-	const CUTOFF = 3;
+	const CUTOFF = 7; // TODO: Make this configurable through the bot
+	const MINUTES = 90; // TODO: Make this configurable through the bot, client abstraction required
 	const timeSinceJoined = message.createdTimestamp - member.joinedTimestamp;
-	const msPerDay = 1000 * 60 * 60 * 24;
+	
+	// 1000(ms / s) * 60(s / min) * 60(min / hr) * 24(hr / day)
+	const msPerDay = 1000 * 60 * 60 * 24; 
 
 	const timeoutMember = Math.floor(timeSinceJoined / msPerDay) <= CUTOFF;
-	const timeoutMessage = "\n\nYou have been timed out for 30 minutes.";
+	const timeoutMessage = `\n\nYou have been timed out for ${MINUTES} minutes.`;
 
 	const content = "Please do not share Discord invite links on the SCESoc server!"
 		+ "\nIf you would still like to share this link, please ask the VP Publications,"
@@ -70,13 +73,25 @@ async function hasUnauthorizedDiscordLink(client: SCESocClient, message: Message
 		+ "\nWe apologize for any inconvenience this causes!"
 		+ (timeoutMember ? timeoutMessage : "");
 
-	// Timeout the member for 30 minutes
-	const TIMEOUT_TIME = 30 * 60 * 1000;
+	/**
+	 * TODO:
+	 * Members timed out for this reason should be added to a collection.
+	 * 
+	 * The timed out members should be able to displayed and / or removed 
+	 * through a command:
+	 * 
+	 * - timeout should be a client member
+	 * 
+	 * client.timeoutMember(message)
+	 */
+
+	// Timeout the member for MINUTES... minutes
+	const TIMEOUT_TIME = MINUTES * 60 * 1000;
 	await member.timeout(TIMEOUT_TIME, "User sent a discord server invite link within 3 days of joining the server.");
 	const reply = await message.reply({ content: content });
 	await client.deleteMessage(message, 0);
 
-	client.deleteMessage(reply, 10_000);
+	client.deleteMessage(reply, 10_000).catch(console.error);
 	client.logNotice(`Discord Link Detected - Sent by a server member ${inviteInfo}`);
 
 	

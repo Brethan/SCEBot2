@@ -197,11 +197,10 @@ export default class SCESocClient extends Client {
 	 * @param delay number of ms before message is deleted
 	 */
 	async deleteMessage(message: Message | undefined, delay = 5_000) {
-		
-		if (!message)
-			return;
-			
 		try {
+			if (!message)
+				return;
+
 			await this.sleep(delay);
 			await message.delete();
 		} catch (e) {
