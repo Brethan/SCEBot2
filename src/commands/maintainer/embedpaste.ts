@@ -1,7 +1,8 @@
 import { APIEmbed, Message, MessageCreateOptions, TextChannel } from "discord.js";
-import { readFile, readdir } from "fs/promises";
+import { mkdir, readFile, readdir } from "fs/promises";
 import SCESocClient from "src/Client";
 import Command, { ElevatedRole } from "../Command";
+import { existsSync } from "fs";
 
 export default class EmbedPaste extends Command {
 	constructor(client: SCESocClient) {
@@ -14,6 +15,10 @@ export default class EmbedPaste extends Command {
 	async textCommand(message: Message): Promise<MessageCreateOptions> {
 		// Filter through all of the copied embeds
 		const dir = "./data/embeds/";
+		if (!existsSync(dir)) {
+			await mkdir(dir, { recursive: true });
+		}
+		
 		const dirContent = (await readdir(dir))
 			.filter(file => file.endsWith(".json"))
 			.filter(file => !isNaN(parseInt(file.split(".")[0])))

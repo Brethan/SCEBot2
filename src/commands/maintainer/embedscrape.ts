@@ -1,7 +1,8 @@
 import { Message, MessageCreateOptions, Snowflake, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
 import Command, { ElevatedRole } from "../Command";
-import { writeFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
+import { existsSync } from "fs";
 
 export default class EmbedScrape extends Command {
 	constructor(client: SCESocClient) {
@@ -13,6 +14,11 @@ export default class EmbedScrape extends Command {
 	}
 
 	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
+		const dir = "./data/embeds/";
+		if (!existsSync(dir)) {
+			await mkdir(dir, { recursive: true });
+		}
+
 		const memberId = message.member?.id;
 
 		if (args.length != 2) {
