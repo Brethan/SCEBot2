@@ -74,13 +74,22 @@ async function hasUnauthorizedDiscordLink(client: SCESocClient, message: Message
 		+ (timeoutMember ? timeoutMessage : "");
 
 	/**
-	 * TODO:
+	 * TODO: make a command for this
+	 * 
 	 * Members timed out for this reason should be added to a collection.
 	 * 
 	 * The timed out members should be able to displayed and / or removed 
 	 * through a command:
 	 * 
-	 * - timeout should be a client member
+	 * - 	timeout should be a client member
+	 * - 	Timing out an advertiser should flag their account and the 
+	 * 		cutoff time will not be considered if they advertise again
+	 * -	Removing an advertiser from the list will cancel the timeout
+	 * 		(if still active) and from the list of advertisers
+	 * -	prefix.advertisers should display a list of all advertisers
+	 * 		and whether or not the timeout is still active
+	 * -	prefix.advertisers remove should be an interactive way for
+	 * 		a moderator+ to remove the flag from the member
 	 * 
 	 * client.timeoutMember(message)
 	 */
