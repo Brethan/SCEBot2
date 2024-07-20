@@ -1,4 +1,4 @@
-import { Invite, Message, TextChannel } from "discord.js";
+import { Guild, GuildMember, Invite, Message, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
 import { CommandUnimplementedError } from "../../commands/Command";
 import { blockedMessage } from "../../../user_modules/blocked_messages";
@@ -7,9 +7,11 @@ module.exports = async (client: SCESocClient, message: Message) => {
 	if (message.partial) 
 		message = await message.fetch();
 
-	if (await hasUnauthorizedDiscordLink(client, message)) {
+	if (await hasUnauthorizedDiscordLink(client, message)) 
 		return;
-	}
+	if (await isTicketScalper(client, message)) 
+		return;
+
 	try { // If message starts with prefix, send to command handler
 		let wasCommand = false;
 		if (message.content.toLowerCase().startsWith(client.prefix)) 
@@ -26,6 +28,43 @@ module.exports = async (client: SCESocClient, message: Message) => {
 		console.error(error)
 	}
 
+}
+
+interface KeywordScores {
+	[keyword: string]: number;
+}
+
+async function isTicketScalper(client: SCESocClient, message: Message): Promise<Boolean> {
+	const { member } = message;
+	if (!member)
+		return false;
+	
+	const msg = message.content.toLowerCase();
+
+	const keywordScoring: KeywordScores = {
+		"sell tickets": 3,
+		"sell my tickets": 3,
+		"buy tickets": 3,
+		"rogers center": 3,
+		"taylor": 2,
+		"swift": 2, 
+		"eras": 1, 
+		"tour": 1, 
+		"interested": 1
+	}
+
+	const keywordCount = Object.keys(keywordScoring).reduce((count, keyword) => msg.includes(keyword) ? count + keywordScoring[keyword] : count, 0);
+
+	if (keywordCount < 8)
+		return false;
+
+	const content = `Please do not advertise tickets on the SCESoc server. (See Rule 3 in ${client.receptionChannel})`;
+		
+	const replyMsg = await message.reply({ content: content });
+	await client.deleteMessage(message, 0);
+	client.deleteMessage(replyMsg, 10_000).catch(console.error);
+	client.logNotice(`Ticket Scalper Detected - Sent by a server member ${member.user.username || ""}`);
+	return true;
 }
 
 async function hasUnauthorizedDiscordLink(client: SCESocClient, message: Message): Promise<boolean> {
@@ -96,15 +135,36 @@ async function hasUnauthorizedDiscordLink(client: SCESocClient, message: Message
 
 	// Timeout the member for MINUTES... minutes
 	const TIMEOUT_TIME = MINUTES * 60 * 1000;
-	await member.timeout(TIMEOUT_TIME, "User sent a discord server invite link within 3 days of joining the server.");
-	const reply = await message.reply({ content: content });
-	await client.deleteMessage(message, 0);
+	const REASON = "User sent a discord server invite link within 3 days of joining the server.";
+	
 
-	client.deleteMessage(reply, 10_000).catch(console.error);
+	await timeoutUser(client, message, content, async () => await timeout(member, TIMEOUT_TIME, REASON));
 	client.logNotice(`Discord Link Detected - Sent by a server member ${inviteInfo}`);
 
 	
 	return true;
+}
+
+
+type AsyncFunction = () => Promise<void>
+
+async function timeout(member: GuildMember, timeout: number, reason: string) {
+	try {
+		await member.timeout(timeout, reason);
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error.name);
+			console.error(error.message);
+			console.error(error.cause);
+		}
+	}
+}
+
+async function timeoutUser(client: SCESocClient, message: Message, reply: string, timeoutCallback: AsyncFunction) {
+	await timeoutCallback();
+	const replyMsg = await message.reply({ content: reply });
+	await client.deleteMessage(message, 0);
+	client.deleteMessage(replyMsg, 10_000).catch(console.error);
 }
 
 /**
