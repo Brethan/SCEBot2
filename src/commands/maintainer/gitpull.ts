@@ -11,6 +11,12 @@ export default class Guild extends Command {
 		})
 	}
 
+	/**
+	 * Crashes the bot. That's all.
+	 * 
+	 * @param message 
+	 * @returns 
+	 */
 	async textCommand(message: Message): Promise<MessageCreateOptions> {
 		this.client.gitpull = message.channel.id;
 		await message.react("💀");

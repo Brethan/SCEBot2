@@ -11,6 +11,12 @@ export default class Guild extends Command {
 		})
 	}
 
+	/**
+	 * Sets the server that this command is ran in to the guild_id in the config file.
+	 * 
+	 * @param message 
+	 * @returns 
+	 */
 	async textCommand(message: Message): Promise<MessageCreateOptions> {
 		if (!message.guild)	throw new Error();
 

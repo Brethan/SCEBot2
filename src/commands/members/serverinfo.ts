@@ -10,6 +10,13 @@ export default class ServerInfo extends Command {
 		})
 	}
 
+	/**
+	 * Compiles various information about the server and formats it
+	 * into an embed message for the guild member invoking the command.
+	 * 
+	 * @param message 
+	 * @returns 
+	 */
 	async textCommand(message: Message): Promise<MessageCreateOptions> {
 		const { guild } = message;
 		if (!guild)

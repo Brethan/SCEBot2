@@ -11,6 +11,13 @@ export default class Remove extends Command {
 		})
 	}
 
+	/**
+	 * Removes a role from a pre-established list of roles which guild members can 
+	 * invoke this command with.
+	 * @param message 
+	 * @param args 
+	 * @returns 
+	 */
 	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
 		const { aliasToProgram } = this.client;
 		const { roles } = this.client.config.channels;

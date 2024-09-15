@@ -2,15 +2,21 @@ import { Message, MessageCreateOptions, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
 import Command, { ElevatedRole } from "../Command";
 
-export default class Ping extends Command {
+export default class Prune extends Command {
 	constructor(client: SCESocClient) {
 		super(client, {
-			name: "evict",
+			name: "prune",
 			elevatedRole: ElevatedRole.MODERATOR,
 			autoclear: 3_000
 		})
 	}
-
+	
+	/**
+	 * 
+	 * @param message 
+	 * @param args 
+	 * @returns 
+	 */
 	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions | null> {
 		if (!(message.channel instanceof TextChannel) || !message.member) 
 			return null;

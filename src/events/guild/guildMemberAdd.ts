@@ -1,6 +1,12 @@
 import { GuildMember } from "discord.js";
 import SCESocClient from "src/Client";
 
+/**
+ * the guildMemberAdd event is emitted every time that a new member joins the
+ * Discord server.
+ * 
+ * The member role will be added to each member that joins.
+ */
 module.exports = async (client: SCESocClient, member: GuildMember) => {
 	try {
 		if (member.partial)

@@ -11,6 +11,14 @@ export default class Channel extends Command {
 		})
 	}
 
+	/**
+	 * Sets the channel the command was invoked within to the specified utility
+	 * channel requested by the maintainer.
+	 * 
+	 * @param message 
+	 * @param args Expecting one of ["log", "roles", "lobby", "interact", "reception", "announcement"]
+	 * @returns 
+	 */
 	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
 		const channels: string[] = [];
 		// Collect all the channels as strings

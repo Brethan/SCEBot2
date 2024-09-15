@@ -11,6 +11,13 @@ export default class Assign extends Command {
 		})
 	}
 
+	/**
+	 * Assigns a role from a pre-established list of roles which guild members can 
+	 * invoke this command with.
+	 * @param message 
+	 * @param args 
+	 * @returns 
+	 */
 	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
 		const { aliasToProgram } = this.client;
 		const { roles } = this.client.config.channels;
@@ -32,6 +39,6 @@ export default class Assign extends Command {
 		await member.roles.add(role);
 		await message.react("👍");
 
-		return {content: "You have been assigned the " + roleName + " role"};
+		return { content: "You have been assigned the " + roleName + " role" };
 	}
 }

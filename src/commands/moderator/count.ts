@@ -1,5 +1,5 @@
 import Command, { ElevatedRole } from "../Command";
-import { Message, MessageCreateOptions, Role } from "discord.js";
+import { Message, MessageCreateOptions } from "discord.js";
 import SCESocClient from "src/Client";
 
 export default class Count extends Command {
@@ -12,6 +12,8 @@ export default class Count extends Command {
 	}
 
 	/**
+	 * Counts the number of people who have been assigned a specific role as defined
+	 * by the list of roles in the role assignment channel in the server.
 	 * 
 	 * @param message 
 	 * @param args 

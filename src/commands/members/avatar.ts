@@ -10,6 +10,14 @@ export default class Avatar extends Command {
 		})
 	}
 
+	/**
+	 * Gets the avatar of a guild member who invokes the command or 
+	 * a target specified in the command string
+	 * 
+	 * @param message 
+	 * @param args 
+	 * @returns 
+	 */
 	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
 		// Select between the command invoker or the invoker's target
 		const { member } = message;

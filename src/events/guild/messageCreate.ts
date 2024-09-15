@@ -1,7 +1,7 @@
-import { Guild, GuildMember, Invite, Message, TextChannel } from "discord.js";
+import { GuildMember, Invite, Message, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
-import { CommandUnimplementedError } from "../../commands/Command";
 import { blockedMessage } from "../../../user_modules/blocked_messages";
+import { CommandUnimplementedError } from "../../commands/Command";
 
 module.exports = async (client: SCESocClient, message: Message) => {
 	if (message.partial) 

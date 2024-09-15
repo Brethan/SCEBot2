@@ -11,6 +11,10 @@ export default class Ping extends Command {
 		})
 	}
 
+	/**
+	 * A command as old as time. Responds with "pong"
+	 * @returns 
+	 */
 	async textCommand(): Promise<MessageCreateOptions> {
 		return { content: "pong!" };
 	}
