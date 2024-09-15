@@ -13,6 +13,16 @@ export default class EmbedScrape extends Command {
 		})
 	}
 
+	/**
+	 * Saves an embed message to the ./data/embeds folder for debugging or 
+	 * to paste it using the embedpaste command. The embed is saved using 
+	 * the current unix timestamp allowing for the most recent save to be 
+	 * retrieved easily.
+	 * 
+	 * @param message 
+	 * @param args 
+	 * @returns 
+	 */
 	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
 		const dir = "./data/embeds/";
 		if (!existsSync(dir)) {

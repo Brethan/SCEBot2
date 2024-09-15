@@ -12,7 +12,17 @@ export default class EmbedPaste extends Command {
 		})
 	}
 
-	async textCommand(message: Message): Promise<MessageCreateOptions> {
+	/**
+	 * Pastes saved embed messages from the server into another channel.
+	 *
+	 * The embedscrape function saves each message using a unix timestamp
+	 * meaning that file the highest value is the most recent message.
+	 * 
+	 * @see ./src/commands/maintainer/embedscrape.ts
+	 * @param message 
+	 * @returns 
+	 */
+	async textCommand(message: Message, args: string[]): Promise<MessageCreateOptions> {
 		// Filter through all of the copied embeds
 		const dir = "./data/embeds/";
 		if (!existsSync(dir)) {
@@ -33,7 +43,17 @@ export default class EmbedPaste extends Command {
 		
 		const raw = await readFile(filename, { encoding: "utf8" });
 		const json: APIEmbed = JSON.parse(raw) satisfies APIEmbed;
-		json.thumbnail = { url: message.guild?.iconURL() || "" };
+
+		if (args.includes("-t"))
+			json.thumbnail = { url: message.guild?.iconURL() || "" };
+		if (args.includes("-a"))
+			json.author = { name: "SCESoc", icon_url: message.guild?.iconURL() || "" };
+		if (args.includes("-f")) {
+			const start = message.content.indexOf("\"", message.content.indexOf("-f")) + 1;
+			const end = message.content.indexOf("\"", start);
+			if (end > start)
+				json.footer = { text: message.content.substring(start, end) }
+		}
 
 		// if there's a channel mentioned in the message, send the embed to that channel
 		const channel = message.mentions.channels.first() as (TextChannel | undefined);
