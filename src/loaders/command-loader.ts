@@ -7,7 +7,8 @@ module.exports = async (client: SCESocClient) => {
 	// get all subfolders in ./src/commands
 	const dir = "./src/commands";
 	const commandFolders = readdirSync(resolve(dir))
-		.filter(folder => !folder.endsWith(".ts"));
+		.filter(folder => !folder.endsWith(".ts"))
+		.filter(folder => folder !== "template");
 	
 	for (const folder of commandFolders) {
 		const commandFiles = readdirSync(resolve(dir, folder))
@@ -25,6 +26,7 @@ module.exports = async (client: SCESocClient) => {
 			
 			// add the command to the collection
 			client.commands.set(command.name, command);
+			client.logInfo("Command " + command.name + " loaded");
 		}
 	}
 }
