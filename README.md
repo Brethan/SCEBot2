@@ -18,6 +18,7 @@ such as slash commands, buttons, forms, etc. can begin.
 
 - [SCEBot2](#scebot2)
   - [How to set up SCEBot for development](#how-to-set-up-scebot-for-development)
+    - [Cloning](#cloning)
     - [Dependencies](#dependencies)
     - [Environment Variables](#environment-variables)
     - [Config](#config)
@@ -25,6 +26,12 @@ such as slash commands, buttons, forms, etc. can begin.
     - [Making a new command](#making-a-new-command)
 
 ## How to set up SCEBot for development
+
+### Cloning
+Clone this repository by running this command in your terminal:
+```
+git clone https://github.com/Brethan/SCEBot2.git
+```
 
 ### Dependencies
 

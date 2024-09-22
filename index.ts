@@ -1,4 +1,4 @@
-import Client from "./src/Client";
+import SCESocClient from "./src/Client";
 import { check_config, check_env } from "./user_modules/file_check";
 
 check_env();
@@ -7,7 +7,7 @@ check_config();
 import { GatewayIntentBits } from "discord.js";
 require("dotenv").config();
 
-const client = new Client({
+const client = new SCESocClient({
 	intents: [
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMembers,
