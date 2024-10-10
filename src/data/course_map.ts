@@ -7,12 +7,12 @@ const convert = {
     bme: "Biomedical and Electrical Engineering", come: "Communications Engineering",
     cse: "Computer Systems Engineering", se: "Software Engineering",
     // CIVE Dept.
-    arch: "Architecture/Arch Engineering",
+    arche: "Architecture/Arch Engineering",
     ce: "Civil Engineering", enve: "Environmental Engineering",
     // ELEC Dept.
     ee: "Electrical Engineering", ep: "Engineering Physics",
     // Design Half
-    id: "Industrial Design",
+    id: "Industrial Design", arch: "Architecture/Arch Engineering",
     irm: "IRM", imd: "IMD", mpd: "MPD", oss: "OSS", net: "NET",
     // Non Eng / Design
     bsp: "Business, Social, Political", al: "Arts, Languages",
@@ -21,7 +21,7 @@ const convert = {
     first: "[First Year Standing]", second: "[Second Year Standing]",
     third: "[Third Year Standing]", fourth: "[Fourth Year Standing]",
     // Pronouns
-    hh: "he/him", ss: "she/her", tt: "they/them",
+    hh: "he/him", sh: "she/her", tt: "they/them",
     // Singletons (Misc.)
     maker: "Maker Club",
 }

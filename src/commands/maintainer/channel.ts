@@ -1,4 +1,4 @@
-import { Message, MessageCreateOptions } from "discord.js";
+import { BaseGuildTextChannel, Message, MessageCreateOptions } from "discord.js";
 import SCESocClient from "src/Client";
 import Command, { ElevatedRole } from "../Command";
 
@@ -38,9 +38,17 @@ export default class Channel extends Command {
 		// Found match(es), set the first match in the 
 		// list to the channel id command was invoked in
 		const selChannel = matches[0];
-		// @ts-ignore
+		const oldChannel = this.client.config.channels[selChannel];
+
+		if (oldChannel === message.channel.id) 
+			return { content: "This channel has already been set as the " + selChannel + " channel" };
+
 		this.client.config.channels[selChannel] = message.channel.id;
+		this.client.specialChannels.set(message.channel.id, <BaseGuildTextChannel>message.channel);
 		this.client.overwriteConfig();
+
+		if (oldChannel)
+			this.client.specialChannels.delete(oldChannel);
 
 		return { content: "This channel has been set as the " + selChannel + " channel" };
 	}
