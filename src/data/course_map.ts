@@ -4,7 +4,7 @@ const convert = {
     ae: "Aerospace Engineering", bmm: "Biomedical Mech",
     me: "Mechanical Engineering", sree: "SREE",
     // SCE Dept.
-    bme: "Biomedical Elec",             come: "Communications Engineering",
+    bme: "Biomedical and Electrical Engineering", come: "Communications Engineering",
     cse: "Computer Systems Engineering", se: "Software Engineering",
     // CIVE Dept.
     arch: "Architecture/Arch Engineering",
