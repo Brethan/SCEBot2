@@ -39,9 +39,20 @@ async function isTicketScalper(client: SCESocClient, message: Message): Promise<
 	if (!member)
 		return false;
 	
+	if (client.isMemberModerator(member)) {
+		return false;
+	}
+
 	const msg = message.content.toLowerCase();
 
 	const keywordScoring: KeywordScores = {
+		"macbook air": 3,
+		"in perfect health": 2,
+		"good as new": 2,
+		"alongside a charger": 1,
+		"strictly first come first serve": 3,
+		"dm if you are interested": 3,
+		"dm if you're interested": 3,
 		"sell tickets": 3,
 		"sell my tickets": 3,
 		"buy tickets": 3,
@@ -53,17 +64,20 @@ async function isTicketScalper(client: SCESocClient, message: Message): Promise<
 		"interested": 1
 	}
 
-	const keywordCount = Object.keys(keywordScoring).reduce((count, keyword) => msg.includes(keyword) ? count + keywordScoring[keyword] : count, 0);
+	const threshold = message.mentions.everyone ? 7 : 10;
+	const keywordCount = Object.keys(keywordScoring)
+		.reduce((count, keyword) => msg.includes(keyword) ? count + keywordScoring[keyword] : count, 0);
 
-	if (keywordCount < 8)
+	if (keywordCount < threshold)
 		return false;
 
 	const content = `Please do not advertise tickets on the SCESoc server. (See Rule 3 in ${client.receptionChannel})`;
 		
 	const replyMsg = await message.reply({ content: content });
 	await client.deleteMessage(message, 0);
+	await timeout(member, 90 * 60_000, "advertising");
 	client.deleteMessage(replyMsg, 10_000).catch(console.error);
-	client.logNotice(`Ticket Scalper Detected - Sent by a server member ${member.user.username || ""}`);
+	client.logNotice(`Scam Detected - Sent by a server member ${member.user.username || ""}`);
 	return true;
 }
 
