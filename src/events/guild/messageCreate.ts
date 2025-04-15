@@ -1,4 +1,4 @@
-import { GuildMember, Invite, Message, TextChannel } from "discord.js";
+import { EmbedBuilder, GuildMember, Invite, Message, TextChannel } from "discord.js";
 import SCESocClient from "src/Client";
 import { blockedMessage } from "../../../user_modules/blocked_messages";
 import { CommandUnimplementedError } from "../../commands/Command";
@@ -30,12 +30,8 @@ module.exports = async (client: SCESocClient, message: Message) => {
 
 }
 
-interface KeywordScores {
-	[keyword: string]: number;
-}
-
 async function isTicketScalper(client: SCESocClient, message: Message): Promise<Boolean> {
-	const { member } = message;
+	const { member, id, channel } = message;
 	if (!member)
 		return false;
 	
@@ -43,30 +39,30 @@ async function isTicketScalper(client: SCESocClient, message: Message): Promise<
 		return false;
 	}
 
+	client.debug("Checking message content for scams...");
 	const msg = message.content.toLowerCase();
 
-	const keywordScoring: KeywordScores = {
-		"macbook air": 3,
-		"in perfect health": 2,
-		"good as new": 2,
-		"alongside a charger": 1,
-		"strictly first come first serve": 3,
-		"dm if you are interested": 3,
-		"dm if you're interested": 3,
-		"sell tickets": 3,
-		"sell my tickets": 3,
-		"buy tickets": 3,
-		"rogers center": 3,
-		"taylor": 2,
-		"swift": 2, 
-		"eras": 1, 
-		"tour": 1, 
-		"interested": 1
-	}
+	const keywordScoring: [RegExp, number][] = [
+		[/macbook air/i, 3],
+		[/in perfect health/i, 2],
+		[/good as new/i, 2],
+		[/alongside a charger/i, 1],
+		[/strictly first come first serve/i, 3],
+		[/(?:dm|hmu) if (?:you[\s’'`]re|you are) interested/i, 4],
+		[/sell (?:my )?tickets/i, 3],
+		[/buy tickets/i, 3],
+		[/rogers center/i, 3],
+		[/taylor/i, 2],
+		[/swift/i, 2],
+		[/kendrick lamar/i, 4],
+		[/grand national/i, 1],
+		[/eras/i, 1],
+		[/tour/i, 1],
+	]
 
 	const threshold = message.mentions.everyone ? 7 : 10;
-	const keywordCount = Object.keys(keywordScoring)
-		.reduce((count, keyword) => msg.includes(keyword) ? count + keywordScoring[keyword] : count, 0);
+	const keywordCount = keywordScoring.reduce((count, [regex, score]) => regex.test(msg) ? count + score : count, 0);
+	client.debug(`Scam message detection: keywordCount: ${keywordCount}; threshold: ${threshold}; result: ${!(keywordCount < threshold)}`);
 
 	if (keywordCount < threshold)
 		return false;
@@ -78,6 +74,16 @@ async function isTicketScalper(client: SCESocClient, message: Message): Promise<
 	await timeout(member, 90 * 60_000, "advertising");
 	client.deleteMessage(replyMsg, 10_000).catch(console.error);
 	client.logNotice(`Scam Detected - Sent by a server member ${member.user.username || ""}`);
+	
+	if (channel instanceof TextChannel) {
+		const embed = new EmbedBuilder()
+			.setDescription(`Scam Message Deleted Automatically\nMessage Id: ${id}`)
+			.setColor("Yellow")
+			.setTimestamp();
+
+		client.serverLog({ embeds: [embed] }, <TextChannel>channel);
+	}
+	
 	return true;
 }
 
