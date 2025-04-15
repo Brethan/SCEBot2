@@ -169,8 +169,9 @@ export default class SCESocClient extends Client {
 		console.log(`[${(new Date()).toISOString()}] ${message}`);
 	}
 
-	debug(message: string) {
-		this.#log("DEBUG: " + message);
+	debug(...message: any[]) {
+		if (this.prefix != "#")
+			this.#log("DEBUG: " + message.join(" "));
 	}
 
 	logWarning(message: string) {
