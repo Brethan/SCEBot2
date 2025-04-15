@@ -9,7 +9,7 @@ module.exports = async (client: SCESocClient, message: Message) => {
 
 	if (await hasUnauthorizedDiscordLink(client, message)) 
 		return;
-	if (await isTicketScalper(client, message)) 
+	if (await messageContainsScam(client, message)) 
 		return;
 
 	try { // If message starts with prefix, send to command handler
@@ -30,7 +30,7 @@ module.exports = async (client: SCESocClient, message: Message) => {
 
 }
 
-async function isTicketScalper(client: SCESocClient, message: Message): Promise<Boolean> {
+async function messageContainsScam(client: SCESocClient, message: Message): Promise<Boolean> {
 	const { member, id, channel } = message;
 	if (!member)
 		return false;
